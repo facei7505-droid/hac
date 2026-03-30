@@ -71,3 +71,49 @@
 .auto-scroll-container:hover {
   animation-play-state: paused;
 }
+
+@keyframes login-appear {
+  from { opacity: 0; transform: translateY(30px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-6px); }
+  20%, 40%, 60%, 80% { transform: translateX(6px); }
+}
+
+@keyframes float-delayed {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes pulse-glow-login {
+  0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 0.6; transform: translate(-50%, -50%) scale(1.05); }
+}
+
+@keyframes error-appear {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-login-appear {
+  animation: login-appear 0.7s ease-out forwards;
+}
+
+.animate-shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+.animate-float-delayed {
+  animation: float-delayed 4s ease-in-out 1s infinite;
+}
+
+.animate-pulse-glow-login {
+  animation: pulse-glow-login 4s ease-in-out infinite;
+}
+
+.animate-error-appear {
+  animation: error-appear 0.3s ease-out forwards;
+}

@@ -1,24 +1,50 @@
 "use client";
 
 import { useState } from "react";
+import { useAuth } from "@/lib/auth";
 import StudentTab from "@/components/StudentTab";
 import TeacherTab from "@/components/TeacherTab";
 import ParentTab from "@/components/ParentTab";
 import AdminTab from "@/components/AdminTab";
 import KioskTab from "@/components/KioskTab";
+import LanguageSwitcher from "./LanguageSwitcher";
+import { Locale } from "@/i18n-config";
 
-const tabs = [
-  { id: "student", label: "Ученик", icon: "🎓" },
-  { id: "teacher", label: "Учитель", icon: "📚" },
-  { id: "parent", label: "Родитель", icon: "👨‍👩‍👧" },
-  { id: "admin", label: "Админ", icon: "⚙️" },
-  { id: "kiosk", label: "Киоск", icon: "📺" },
-] as const;
+import { UserRole } from "@/data/users";
 
-type TabId = (typeof tabs)[number]["id"];
+type TabDef = {
+  id: string;
+  label: string;
+  icon: string;
+  roles: UserRole[];
+};
 
-export default function Dashboard() {
-  const [activeTab, setActiveTab] = useState<TabId>("student");
+const allTabs: TabDef[] = [
+  { id: "student", label: "Ученик", icon: "🎓", roles: ["student"] },
+  { id: "teacher", label: "Учитель", icon: "📚", roles: ["teacher"] },
+  { id: "parent", label: "Родитель", icon: "👨‍👩‍👧", roles: [] },
+  { id: "admin", label: "Админ", icon: "⚙️", roles: ["admin"] },
+  { id: "kiosk", label: "Киоск", icon: "📺", roles: ["student", "teacher", "admin"] },
+];
+
+type TabId = string;
+
+const roleLabelsKeys: Record<string, string> = {
+  student: "student",
+  teacher: "teacher",
+  admin: "admin",
+};
+
+export default function Dashboard({ dictionary, lang }: { dictionary: any; lang: Locale }) {
+  const { user, logout } = useAuth();
+
+  const visibleTabs = allTabs.filter((tab) =>
+    user ? tab.roles.includes(user.role) : false
+  );
+
+  const [activeTab, setActiveTab] = useState<TabId>(
+    visibleTabs.length > 0 ? visibleTabs[0].id : "kiosk"
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
@@ -34,12 +60,32 @@ export default function Dashboard() {
                 <h1 className="text-xl font-bold bg-gradient-to-r from-brand to-brand-light bg-clip-text text-transparent">
                   Aqbobek Lyceum
                 </h1>
-                <p className="text-xs text-gray-400 -mt-0.5">School Intelligence Platform</p>
+                <p className="text-xs text-gray-400 -mt-0.5">{dictionary.dashboard.subtitle}</p>
               </div>
             </div>
-            <div className="flex items-center gap-2 text-sm text-gray-500">
-              <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
-              System Online
+            <div className="flex items-center gap-4">
+              <LanguageSwitcher currentLang={lang} />
+              <div className="flex items-center gap-2 text-sm text-gray-500">
+                <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
+                {dictionary.dashboard.systemOnline}
+              </div>
+              {user && (
+                <div className="flex items-center gap-3 pl-4 border-l border-gray-200">
+                  <div className="hidden sm:block text-right">
+                    <p className="text-sm font-medium text-gray-700 leading-tight">{user.name}</p>
+                    <p className="text-xs text-brand-light">{dictionary.dashboard.tabs[roleLabelsKeys[user.role]]}</p>
+                  </div>
+                  <button
+                    onClick={logout}
+                    className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-500 hover:text-danger hover:bg-red-50 rounded-lg transition-all duration-200"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+                    </svg>
+                    <span className="hidden sm:inline">{dictionary.dashboard.logout}</span>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -48,7 +94,7 @@ export default function Dashboard() {
       {/* Tab Navigation */}
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
         <div className="flex gap-1 p-1.5 bg-gray-100/80 rounded-2xl backdrop-blur-sm">
-          {tabs.map((tab) => (
+          {visibleTabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
@@ -62,7 +108,7 @@ export default function Dashboard() {
               `}
             >
               <span className="text-lg">{tab.icon}</span>
-              <span className="hidden sm:inline">{tab.label}</span>
+              <span className="hidden sm:inline">{dictionary.dashboard.tabs[tab.id as keyof typeof dictionary.dashboard.tabs] || tab.label}</span>
             </button>
           ))}
         </div>

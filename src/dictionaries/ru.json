@@ -1,0 +1,30 @@
+{
+  "login": {
+    "title": "Добро пожаловать",
+    "subtitle": "Платформа школьного интеллекта",
+    "signInTitle": "Вход в систему",
+    "emailLabel": "Email",
+    "emailPlaceholder": "user1@aqbobek.kz",
+    "passwordLabel": "Пароль",
+    "passwordPlaceholder": "••••••",
+    "signInBtn": "Войти",
+    "errorMsg": "Ошибка входа",
+    "demoAccounts": "Демо-аккаунты:",
+    "roleStudent": "Ученик",
+    "roleTeacher": "Учитель",
+    "roleAdmin": "Админ",
+    "passwordHint": "Пароль: 123"
+  },
+  "dashboard": {
+    "subtitle": "Платформа школьного интеллекта",
+    "systemOnline": "Система онлайн",
+    "logout": "Выйти",
+    "tabs": {
+      "student": "Ученик",
+      "teacher": "Учитель",
+      "parent": "Родитель",
+      "admin": "Админ",
+      "kiosk": "Киоск"
+    }
+  }
+}

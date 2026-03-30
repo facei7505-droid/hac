@@ -1,0 +1,30 @@
+{
+  "login": {
+    "title": "Welcome",
+    "subtitle": "School Intelligence Platform",
+    "signInTitle": "Sign In",
+    "emailLabel": "Email",
+    "emailPlaceholder": "user1@aqbobek.kz",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "••••••",
+    "signInBtn": "Log In",
+    "errorMsg": "Login error",
+    "demoAccounts": "Demo Accounts:",
+    "roleStudent": "Student",
+    "roleTeacher": "Teacher",
+    "roleAdmin": "Admin",
+    "passwordHint": "Password: 123"
+  },
+  "dashboard": {
+    "subtitle": "School Intelligence Platform",
+    "systemOnline": "System Online",
+    "logout": "Logout",
+    "tabs": {
+      "student": "Student",
+      "teacher": "Teacher",
+      "parent": "Parent",
+      "admin": "Admin",
+      "kiosk": "Kiosk"
+    }
+  }
+}

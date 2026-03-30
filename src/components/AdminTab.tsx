@@ -1,32 +1,8 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-
-const logSteps = [
-  { text: "📥 Импорт данных: 847 учеников, 52 учителя, 38 кабинетов загружено", status: "done" },
-  { text: "🔍 Анализ ограничений: проверка совместимости предметов и кабинетов", status: "done" },
-  { text: "📊 Оптимизация: genetic algorithm iteration 1/50...", status: "running" },
-  { text: "📊 Оптимизация: genetic algorithm iteration 15/50...", status: "pending" },
-  { text: "📊 Оптимизация: genetic algorithm iteration 35/50...", status: "pending" },
-  { text: "📊 Оптимизация: genetic algorithm iteration 50/50...", status: "pending" },
-  { text: "✅ Расписание сгенерировано! Fitness score: 98.7%", status: "pending" },
-  { text: "📋 Конфликты: 0 критических, 2 незначительных", status: "pending" },
-  { text: "📤 Экспорт: расписание опубликовано для всех классов", status: "pending" },
-];
-
-const stats = [
-  { label: "Учеников", value: "847", icon: "👨‍🎓", delta: "+12" },
-  { label: "Учителей", value: "52", icon: "👩‍🏫", delta: "+3" },
-  { label: "Кабинетов", value: "38", icon: "🏫", delta: "0" },
-  { label: "Предметов", value: "24", icon: "📚", delta: "+1" },
-];
-
-const quickActions = [
-  { label: "Экспорт расписания", icon: "📄", color: "from-blue-500 to-cyan-500" },
-  { label: "Отправить уведомления", icon: "🔔", color: "from-amber-500 to-orange-500" },
-  { label: "Генерация отчётов", icon: "📊", color: "from-emerald-500 to-green-500" },
-  { label: "Резервное копирование", icon: "💾", color: "from-purple-500 to-violet-500" },
-];
+import { adminStats, quickActions, logSteps, systemServices } from "@/data/admin";
+import Spinner from "@/components/ui/Spinner";
 
 export default function AdminTab() {
   const [generating, setGenerating] = useState(false);
@@ -56,15 +32,13 @@ export default function AdminTab() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div>
         <h2 className="text-2xl font-bold text-gray-900">Панель администратора</h2>
         <p className="text-gray-500 text-sm mt-1">Управление школьной системой</p>
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        {stats.map((s) => (
+        {adminStats.map((s) => (
           <div key={s.label} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
             <div className="flex items-center justify-between mb-3">
               <span className="text-2xl">{s.icon}</span>
@@ -79,7 +53,6 @@ export default function AdminTab() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Smart Schedule Generation */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
           <h3 className="text-lg font-bold text-gray-900 mb-2 flex items-center gap-2">
             <span>🧠</span> Умная генерация расписания
@@ -99,10 +72,7 @@ export default function AdminTab() {
           >
             {generating ? (
               <span className="flex items-center justify-center gap-3">
-                <svg className="animate-spin w-6 h-6" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
+                <Spinner className="w-6 h-6" />
                 Генерация...
               </span>
             ) : (
@@ -110,7 +80,6 @@ export default function AdminTab() {
             )}
           </button>
 
-          {/* Progress */}
           {visibleLogs > 0 && (
             <div className="mt-4">
               <div className="flex items-center justify-between mb-2">
@@ -127,7 +96,6 @@ export default function AdminTab() {
           )}
         </div>
 
-        {/* Logs */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
           <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
             <span>📋</span> Логи процесса
@@ -159,7 +127,6 @@ export default function AdminTab() {
         </div>
       </div>
 
-      {/* Quick Actions */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
         <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
           <span>⚡</span> Быстрые действия
@@ -177,17 +144,12 @@ export default function AdminTab() {
         </div>
       </div>
 
-      {/* System Status */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
         <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
           <span>🖥️</span> Статус системы
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {[
-            { name: "База данных", status: "Онлайн", ok: true, latency: "12ms" },
-            { name: "AI Engine", status: "Онлайн", ok: true, latency: "45ms" },
-            { name: "Email Service", status: "Онлайн", ok: true, latency: "120ms" },
-          ].map((svc) => (
+          {systemServices.map((svc) => (
             <div key={svc.name} className="flex items-center justify-between p-3 rounded-xl bg-gray-50/50">
               <div className="flex items-center gap-2">
                 <div className={`w-2 h-2 rounded-full ${svc.ok ? "bg-emerald-500 animate-pulse" : "bg-red-500"}`} />

@@ -1,41 +1,9 @@
 "use client";
 
 import { useState } from "react";
-
-interface StudentRow {
-  name: string;
-  mmr: number;
-  mmrTier: string;
-  gpa: number;
-  trend: "up" | "down" | "stable";
-  attendance: number;
-  risk: "low" | "medium" | "high";
-  subjects: { name: string; grade: number }[];
-}
-
-const students: StudentRow[] = [
-  { name: "Айдар Нурланов", mmr: 1842, mmrTier: "Legendary", gpa: 4.6, trend: "up", attendance: 97, risk: "low", subjects: [{ name: "Мат", grade: 5 }, { name: "Физ", grade: 5 }] },
-  { name: "Амина Касымова", mmr: 1234, mmrTier: "Silver", gpa: 3.2, trend: "down", attendance: 78, risk: "high", subjects: [{ name: "Мат", grade: 3 }, { name: "Физ", grade: 2 }] },
-  { name: "Данияр Ахметов", mmr: 1567, mmrTier: "Gold", gpa: 4.1, trend: "stable", attendance: 92, risk: "low", subjects: [{ name: "Мат", grade: 4 }, { name: "Физ", grade: 4 }] },
-  { name: "Жанель Сагынбаева", mmr: 980, mmrTier: "Bronze", gpa: 2.8, trend: "down", attendance: 71, risk: "high", subjects: [{ name: "Мат", grade: 3 }, { name: "Физ", grade: 2 }] },
-  { name: "Нурлан Оразов", mmr: 1720, mmrTier: "Platinum", gpa: 4.4, trend: "up", attendance: 95, risk: "low", subjects: [{ name: "Мат", grade: 5 }, { name: "Физ", grade: 4 }] },
-  { name: "Сабина Ермекова", mmr: 1100, mmrTier: "Silver", gpa: 3.5, trend: "down", attendance: 83, risk: "medium", subjects: [{ name: "Мат", grade: 3 }, { name: "Физ", grade: 4 }] },
-  { name: "Тимур Кенжебаев", mmr: 1650, mmrTier: "Gold", gpa: 4.3, trend: "up", attendance: 94, risk: "low", subjects: [{ name: "Мат", grade: 5 }, { name: "Физ", grade: 4 }] },
-  { name: "Алия Бекова", mmr: 890, mmrTier: "Bronze", gpa: 2.5, trend: "down", attendance: 65, risk: "high", subjects: [{ name: "Мат", grade: 2 }, { name: "Физ", grade: 2 }] },
-];
-
-function getMMRColor(mmr: number) {
-  if (mmr >= 2000) return "text-amber-500";
-  if (mmr >= 1500) return "text-purple-500";
-  if (mmr >= 1000) return "text-blue-500";
-  return "text-gray-500";
-}
-
-function getRiskBadge(risk: string) {
-  if (risk === "high") return "bg-red-100 text-red-700 border-red-200";
-  if (risk === "medium") return "bg-amber-100 text-amber-700 border-amber-200";
-  return "bg-emerald-100 text-emerald-700 border-emerald-200";
-}
+import { teacherStudents } from "@/data/students";
+import { getMMRTextColor, getGradeBadgeColor, getRiskBadge } from "@/lib/utils";
+import Spinner from "@/components/ui/Spinner";
 
 export default function TeacherTab() {
   const [generating, setGenerating] = useState(false);
@@ -64,7 +32,7 @@ export default function TeacherTab() {
     }, 2500);
   };
 
-  const filtered = students.filter((s) => {
+  const filtered = teacherStudents.filter((s) => {
     if (filter === "risk") return s.risk === "high" || s.risk === "medium";
     if (filter === "down") return s.trend === "down";
     return true;
@@ -72,7 +40,6 @@ export default function TeacherTab() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Early Warning System</h2>
@@ -95,13 +62,12 @@ export default function TeacherTab() {
         </div>
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { label: "Всего учеников", value: students.length, icon: "👥", color: "from-blue-500 to-cyan-500" },
-          { label: "В зоне риска", value: students.filter((s) => s.risk === "high").length, icon: "🚨", color: "from-red-500 to-rose-500" },
-          { label: "Падающий тренд", value: students.filter((s) => s.trend === "down").length, icon: "📉", color: "from-amber-500 to-orange-500" },
-          { label: "Средний GPA", value: (students.reduce((a, s) => a + s.gpa, 0) / students.length).toFixed(1), icon: "📊", color: "from-emerald-500 to-green-500" },
+          { label: "Всего учеников", value: teacherStudents.length, icon: "👥", color: "from-blue-500 to-cyan-500" },
+          { label: "В зоне риска", value: teacherStudents.filter((s) => s.risk === "high").length, icon: "🚨", color: "from-red-500 to-rose-500" },
+          { label: "Падающий тренд", value: teacherStudents.filter((s) => s.trend === "down").length, icon: "📉", color: "from-amber-500 to-orange-500" },
+          { label: "Средний GPA", value: (teacherStudents.reduce((a, s) => a + s.gpa, 0) / teacherStudents.length).toFixed(1), icon: "📊", color: "from-emerald-500 to-green-500" },
         ].map((stat) => (
           <div key={stat.label} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
             <div className="flex items-center gap-2 mb-2">
@@ -115,7 +81,6 @@ export default function TeacherTab() {
         ))}
       </div>
 
-      {/* Table */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -147,7 +112,7 @@ export default function TeacherTab() {
                     </div>
                   </td>
                   <td className="px-4 py-4">
-                    <span className={`text-sm font-bold ${getMMRColor(s.mmr)}`}>
+                    <span className={`text-sm font-bold ${getMMRTextColor(s.mmr)}`}>
                       {s.mmr}
                     </span>
                     <span className="text-xs text-gray-400 ml-1">{s.mmrTier}</span>
@@ -177,11 +142,7 @@ export default function TeacherTab() {
                       {s.subjects.map((sub) => (
                         <span
                           key={sub.name}
-                          className={`px-2 py-1 rounded-md text-xs font-bold border ${
-                            sub.grade >= 4 ? "bg-emerald-50 text-emerald-700 border-emerald-200" :
-                            sub.grade >= 3 ? "bg-amber-50 text-amber-700 border-amber-200" :
-                            "bg-red-50 text-red-700 border-red-200"
-                          }`}
+                          className={`px-2 py-1 rounded-md text-xs font-bold border ${getGradeBadgeColor(sub.grade)}`}
                         >
                           {sub.name} {sub.grade}
                         </span>
@@ -195,7 +156,6 @@ export default function TeacherTab() {
         </div>
       </div>
 
-      {/* AI Report */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
@@ -212,7 +172,7 @@ export default function TeacherTab() {
           >
             {generating ? (
               <span className="flex items-center gap-2">
-                <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+                <Spinner />
                 Генерация...
               </span>
             ) : "Сгенерировать AI-отчёт"}

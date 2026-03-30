@@ -1,0 +1,30 @@
+{
+  "login": {
+    "title": "Қош келдіңіз",
+    "subtitle": "Мектеп зияткерлік платформасы",
+    "signInTitle": "Жүйеге кіру",
+    "emailLabel": "Email",
+    "emailPlaceholder": "user1@aqbobek.kz",
+    "passwordLabel": "Құпиясөз",
+    "passwordPlaceholder": "••••••",
+    "signInBtn": "Кіру",
+    "errorMsg": "Кіру қатесі",
+    "demoAccounts": "Демо-аккаунттар:",
+    "roleStudent": "Оқушы",
+    "roleTeacher": "Мұғалім",
+    "roleAdmin": "Әкімші",
+    "passwordHint": "Құпиясөз: 123"
+  },
+  "dashboard": {
+    "subtitle": "Мектеп зияткерлік платформасы",
+    "systemOnline": "Жүйе желіде",
+    "logout": "Шығу",
+    "tabs": {
+      "student": "Оқушы",
+      "teacher": "Мұғалім",
+      "parent": "Ата-ана",
+      "admin": "Әкімші",
+      "kiosk": "Киоск"
+    }
+  }
+}

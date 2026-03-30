@@ -1,79 +1,15 @@
 "use client";
 
 import { useState } from "react";
-
-const child = {
-  name: "Айдар Нурланов",
-  grade: "10-A",
-  avatar: "🧑‍🎓",
-  gpa: 4.6,
-};
-
-const weeklyData = [4.2, 4.5, 4.3, 4.7, 4.6, 4.8, 4.6];
-const days = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
-
-const weeklySummary = [
-  { day: "Понедельник", events: ["Математика — 5 (контрольная)", "Физика — 5 (лабораторная)"], note: "Отличный старт недели" },
-  { day: "Вторник", events: ["Химия — 4 (тест)", "Английский — 5 (презентация)"], note: "Небольшой спад в химии" },
-  { day: "Среда", events: ["История — 5 (доклад)", "Литература — 4 (эссе)"], note: "Активное участие на уроках" },
-  { day: "Четверг", events: ["Информатика — 5 (проект)", "Биология — 4 (лабораторная)"], note: "Проект по программированию — отлично" },
-  { day: "Пятница", events: ["Математика — 5", "Физика — 5"], note: "Завершение недели на высоте" },
-];
-
-const aiTips = [
-  { icon: "📚", tip: "Ребёнок показывает стабильный прогресс. Рекомендуем поддерживать текущий темп занятий." },
-  { icon: "🧪", tip: "Химия — единственный предмет с оценкой 4. Дополнительные 30 минут в день могут поднять до 5." },
-  { icon: "🧠", tip: "Когнитивные тесты показывают сильные навыки логического мышления. Развивайте это дальше." },
-  { icon: "😴", tip: "Режим сна важен: рекомендуем ложиться до 22:30 для оптимальной концентрации." },
-];
-
-function Sparkline({ data, color }: { data: number[]; color: string }) {
-  const max = Math.max(...data);
-  const min = Math.min(...data);
-  const range = max - min || 1;
-  const h = 48;
-  const w = 100;
-  const points = data.map((v, i) => {
-    const x = (i / (data.length - 1)) * w;
-    const y = h - ((v - min) / range) * h;
-    return `${x},${y}`;
-  });
-
-  return (
-    <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-16">
-      <defs>
-        <linearGradient id={`sparkGrad-${color}`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={color} stopOpacity="0.3" />
-          <stop offset="100%" stopColor={color} stopOpacity="0" />
-        </linearGradient>
-      </defs>
-      <polygon
-        points={`0,${h} ${points.join(" ")} ${w},${h}`}
-        fill={`url(#sparkGrad-${color})`}
-      />
-      <polyline
-        points={points.join(" ")}
-        fill="none"
-        stroke={color}
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      {data.map((v, i) => {
-        const x = (i / (data.length - 1)) * w;
-        const y = h - ((v - min) / range) * h;
-        return <circle key={i} cx={x} cy={y} r="3" fill={color} className="drop-shadow-sm" />;
-      })}
-    </svg>
-  );
-}
+import { student as child, weeklyData, weekDays } from "@/data/students";
+import { weeklySummary, aiTips } from "@/data/parent";
+import Sparkline from "@/components/ui/Sparkline";
 
 export default function ParentTab() {
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Недельная выжимка</h2>
@@ -89,7 +25,6 @@ export default function ParentTab() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Sparkline Chart */}
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
             <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
@@ -98,7 +33,7 @@ export default function ParentTab() {
             </h3>
             <Sparkline data={weeklyData} color="#1e40af" />
             <div className="flex justify-between mt-2">
-              {days.map((d, i) => (
+              {weekDays.map((d) => (
                 <span key={d} className="text-xs text-gray-400">{d}</span>
               ))}
             </div>
@@ -118,7 +53,6 @@ export default function ParentTab() {
             </div>
           </div>
 
-          {/* Daily Breakdown */}
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
             <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
               <span className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center">📅</span>
@@ -158,7 +92,6 @@ export default function ParentTab() {
           </div>
         </div>
 
-        {/* AI Tips */}
         <div className="space-y-6">
           <div className="bg-gradient-to-br from-violet-600 to-purple-700 rounded-2xl p-6 text-white shadow-xl shadow-purple-500/20 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-8 translate-x-8" />
@@ -176,7 +109,6 @@ export default function ParentTab() {
             </div>
           </div>
 
-          {/* Quick Stats */}
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
             <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
               <span className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">⚡</span>

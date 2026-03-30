@@ -1,47 +1,9 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-
-const substitutions = [
-  { time: "08:30", class: "10-A", subject: "Математика", teacher: "Иванова А.К.", room: "204", change: "Замена: Петров → Иванова" },
-  { time: "09:20", class: "9-Б", subject: "Физика", teacher: "Сидоров П.М.", room: "312", change: "Кабинет: 115 → 312" },
-  { time: "10:15", class: "11-А", subject: "Химия", teacher: "Козлова Е.В.", room: "208", change: "Замена: Мухамедьярова → Козлова" },
-  { time: "11:00", class: "8-В", subject: "История", teacher: "Ахметов Н.Р.", room: "105", change: "Отменён" },
-  { time: "11:50", class: "10-Б", subject: "Английский", teacher: "Браун Дж.", room: "301", change: "Замена: Уильямс → Браун" },
-  { time: "12:40", class: "7-А", subject: "Биология", teacher: "Турсунова Г.М.", room: "210", change: "Кабинет: 205 → 210" },
-  { time: "13:30", class: "11-Б", subject: "Информатика", teacher: "Кенжебаев А.Т.", room: "401", change: "Замена: Сатпаев → Кенжебаев" },
-  { time: "14:20", class: "9-А", subject: "Литература", teacher: "Нурланова С.К.", room: "108", change: "Замена: Ермекова → Нурланова" },
-  { time: "15:10", class: "8-А", subject: "География", teacher: "Омаров Д.С.", room: "203", change: "Кабинет: 301 → 203" },
-  { time: "16:00", class: "7-Б", subject: "Музыка", teacher: "Асанова Р.Н.", room: "Музыкальный", change: "Замена: Жумабаева → Асанова" },
-];
-
-const topStudents = [
-  { name: "Айдар Нурланов", grade: "10-A", mmr: 1842, gpa: 4.6, avatar: "🧑‍🎓" },
-  { name: "Нурлан Оразов", grade: "9-Б", mmr: 1720, gpa: 4.4, avatar: "👦" },
-  { name: "Тимур Кенжебаев", grade: "11-А", mmr: 1650, gpa: 4.3, avatar: "🧒" },
-];
-
-const schedule = [
-  { time: "08:30 - 09:15", subject: "Математика", teacher: "Иванова А.К.", room: "204" },
-  { time: "09:25 - 10:10", subject: "Физика", teacher: "Сидоров П.М.", room: "312" },
-  { time: "10:20 - 11:05", subject: "Химия", teacher: "Козлова Е.В.", room: "208" },
-  { time: "11:20 - 12:05", subject: "История", teacher: "Ахметов Н.Р.", room: "105" },
-  { time: "12:15 - 13:00", subject: "Английский", teacher: "Браун Дж.", room: "301" },
-];
-
-function getMMRColor(mmr: number) {
-  if (mmr >= 2000) return "text-amber-400";
-  if (mmr >= 1500) return "text-purple-400";
-  if (mmr >= 1000) return "text-blue-400";
-  return "text-gray-400";
-}
-
-function getCup(idx: number) {
-  if (idx === 0) return "🏆";
-  if (idx === 1) return "🥈";
-  if (idx === 2) return "🥉";
-  return "";
-}
+import { topStudentsKiosk } from "@/data/students";
+import { substitutions, schedule } from "@/data/schedule";
+import { getMMRTextColorKiosk, getCup } from "@/lib/utils";
 
 export default function KioskTab() {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -84,7 +46,6 @@ export default function KioskTab() {
 
   return (
     <div className="min-h-screen -mx-[calc((100vw-100%)/2)] -mt-8 bg-gray-950 text-white px-8 py-6">
-      {/* Kiosk Header */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-brand to-brand-light flex items-center justify-center shadow-lg shadow-brand/30">
@@ -104,7 +65,6 @@ export default function KioskTab() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Substitutions - Auto-scrolling */}
         <div className="lg:col-span-2 bg-gray-900/50 rounded-3xl border border-gray-800/50 overflow-hidden">
           <div className="p-6 pb-3 border-b border-gray-800/50">
             <h2 className="text-2xl font-bold flex items-center gap-3">
@@ -154,16 +114,14 @@ export default function KioskTab() {
           </div>
         </div>
 
-        {/* Right Column */}
         <div className="space-y-6">
-          {/* Top 3 Students */}
           <div className="bg-gray-900/50 rounded-3xl border border-gray-800/50 p-6">
             <h2 className="text-2xl font-bold flex items-center gap-3 mb-6">
               <span className="text-amber-400">👑</span>
               Топ учеников дня
             </h2>
             <div className="space-y-4">
-              {topStudents.map((s, i) => (
+              {topStudentsKiosk.map((s, i) => (
                 <div
                   key={s.name}
                   className={`flex items-center gap-4 p-4 rounded-2xl transition-all ${
@@ -185,7 +143,7 @@ export default function KioskTab() {
                     </div>
                   </div>
                   <div className="text-right flex-shrink-0">
-                    <div className={`text-2xl font-black ${getMMRColor(s.mmr)}`}>
+                    <div className={`text-2xl font-black ${getMMRTextColorKiosk(s.mmr)}`}>
                       {s.mmr}
                     </div>
                     <div className="text-xs text-gray-500">MMR</div>
@@ -196,7 +154,6 @@ export default function KioskTab() {
             </div>
           </div>
 
-          {/* Today's Schedule */}
           <div className="bg-gray-900/50 rounded-3xl border border-gray-800/50 p-6">
             <h2 className="text-2xl font-bold flex items-center gap-3 mb-4">
               <span className="text-brand-light">🕐</span>
