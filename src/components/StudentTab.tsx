@@ -438,6 +438,7 @@ const CLAIM_KEY = "weekly_mmr_claimed";
 function WeeklyBonus() {
   const [claimed, setClaimed] = useState(false);
   const [claiming, setClaiming] = useState(false);
+  const { addMmrBonus } = useStudentData();
 
   useEffect(() => {
     try {
@@ -465,6 +466,8 @@ function WeeklyBonus() {
     try {
       localStorage.setItem(CLAIM_KEY, new Date().toISOString());
     } catch {}
+
+    addMmrBonus(STUDENT_ID, 50);
 
     setTimeout(() => {
       setClaimed(true);

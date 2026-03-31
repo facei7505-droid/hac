@@ -250,6 +250,15 @@ export default function ProfileView({ profileId, lang }: { profileId: string; la
                   </div>
                 )}
 
+                {!isOwnProfile && user && (
+                  <button
+                    onClick={() => router.push(`/${lang}/messenger?chatId=${profileId}`)}
+                    className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-sm font-medium shadow-lg shadow-indigo-500/20 hover:shadow-xl hover:shadow-indigo-500/30 transition-all duration-300 cursor-pointer active:scale-95"
+                  >
+                    💬 Отправить сообщение
+                  </button>
+                )}
+
                 <p className="text-slate-300 text-sm mt-4 leading-relaxed">{profile.bio}</p>
 
                 <div className="flex flex-wrap gap-1.5 mt-4 justify-center">

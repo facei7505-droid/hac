@@ -1,14 +1,89 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { topStudentsKiosk } from "@/data/students";
+import { useEffect, useRef, useState, useCallback } from "react";
+import { topStudentsKiosk, teacherStudents } from "@/data/students";
 import { substitutions, schedule } from "@/data/schedule";
 import { getMMRTextColorKiosk, getCup } from "@/lib/utils";
 import { useI18n } from "./I18nProvider";
 
+const MMR_STORAGE_KEY = "aqbobek_mmr_bonuses";
+const OVERRIDES_STORAGE_KEY = "aqbobek_student_overrides";
+
+function loadMmrBonuses(): Record<string, number> {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = localStorage.getItem(MMR_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch { return {}; }
+}
+
+function loadOverrides(): Record<string, Record<string, Record<string, number | "Н" | null>>> {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = localStorage.getItem(OVERRIDES_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch { return {}; }
+}
+
+const STUDENT_ID_MAP: Record<string, string> = {
+  "Айдар Нурланов": "s1",
+  "Амина Касымова": "s2",
+  "Данияр Ахметов": "s3",
+  "Жанель Сагынбаева": "s4",
+  "Нурлан Оразов": "s5",
+  "Сабина Ермекова": "s6",
+  "Тимур Кенжебаев": "s7",
+  "Алия Бекова": "s8",
+};
+
+function computeTopStudents() {
+  const bonuses = loadMmrBonuses();
+  const overrides = loadOverrides();
+
+  return topStudentsKiosk.map((s) => {
+    const sid = STUDENT_ID_MAP[s.name];
+    const bonus = sid ? (bonuses[sid] || 0) : 0;
+
+    let gradeDelta = 0;
+    if (sid && overrides[sid]) {
+      for (const [, grades] of Object.entries(overrides[sid])) {
+        for (const [, val] of Object.entries(grades)) {
+          if (typeof val === "number") {
+            if (val === 5) gradeDelta += 10;
+            else if (val === 4) gradeDelta += 3;
+            else if (val === 3) gradeDelta -= 5;
+            else if (val === 2) gradeDelta -= 15;
+            else if (val === 1) gradeDelta -= 25;
+          }
+        }
+      }
+    }
+
+    return { ...s, mmr: s.mmr + bonus + gradeDelta };
+  }).sort((a, b) => b.mmr - a.mmr);
+}
+
 export default function KioskTab() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const { t, lang } = useI18n();
+  const [topStudents, setTopStudents] = useState(() => computeTopStudents());
+
+  const refresh = useCallback(() => {
+    setTopStudents(computeTopStudents());
+  }, []);
+
+  useEffect(() => {
+    function handleCustom() { refresh(); }
+    function handleStorage(e: StorageEvent) {
+      if (e.key === MMR_STORAGE_KEY || e.key === OVERRIDES_STORAGE_KEY) refresh();
+    }
+    window.addEventListener("userDataUpdated", handleCustom);
+    window.addEventListener("storage", handleStorage);
+    return () => {
+      window.removeEventListener("userDataUpdated", handleCustom);
+      window.removeEventListener("storage", handleStorage);
+    };
+  }, [refresh]);
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -126,7 +201,7 @@ export default function KioskTab() {
               {t("kiosk.topStudents")}
             </h2>
             <div className="space-y-4">
-              {topStudentsKiosk.map((s, i) => (
+              {topStudents.map((s, i) => (
                 <div
                   key={s.name}
                   className={`flex items-center gap-4 p-4 rounded-2xl transition-all ${

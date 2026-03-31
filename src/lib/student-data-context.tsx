@@ -199,22 +199,29 @@ export function StudentDataProvider({ children }: { children: ReactNode }) {
     setOverrides(loadOverrides());
     setMmrBonuses(loadMmrBonuses());
     setTimestamps(loadTimestamps());
+
+    function reloadAll() {
+      setOverrides(loadOverrides());
+      setMmrBonuses(loadMmrBonuses());
+      setTimestamps(loadTimestamps());
+      setVersion((v) => v + 1);
+    }
+
     function handleStorage(e: StorageEvent) {
-      if (e.key === STORAGE_KEY) {
-        setOverrides(loadOverrides());
-        setVersion((v) => v + 1);
-      }
-      if (e.key === MMR_STORAGE_KEY) {
-        setMmrBonuses(loadMmrBonuses());
-        setVersion((v) => v + 1);
-      }
-      if (e.key === TIMESTAMPS_STORAGE_KEY) {
-        setTimestamps(loadTimestamps());
-        setVersion((v) => v + 1);
+      if (e.key === STORAGE_KEY || e.key === MMR_STORAGE_KEY || e.key === TIMESTAMPS_STORAGE_KEY) {
+        reloadAll();
       }
     }
+    function handleCustom() {
+      reloadAll();
+    }
+
     window.addEventListener("storage", handleStorage);
-    return () => window.removeEventListener("storage", handleStorage);
+    window.addEventListener("userDataUpdated", handleCustom);
+    return () => {
+      window.removeEventListener("storage", handleStorage);
+      window.removeEventListener("userDataUpdated", handleCustom);
+    };
   }, []);
 
   const setOverride = useCallback(
@@ -230,6 +237,7 @@ export function StudentDataProvider({ children }: { children: ReactNode }) {
         }
         saveOverrides(next);
         setVersion((v) => v + 1);
+        window.dispatchEvent(new Event("userDataUpdated"));
         return next;
       });
       if (value !== null) {
@@ -252,6 +260,7 @@ export function StudentDataProvider({ children }: { children: ReactNode }) {
         const next = { ...prev, [studentId]: (prev[studentId] || 0) + amount };
         saveMmrBonuses(next);
         setVersion((v) => v + 1);
+        window.dispatchEvent(new Event("userDataUpdated"));
         return next;
       });
     },
