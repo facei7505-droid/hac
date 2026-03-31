@@ -30,9 +30,6 @@ export default function LoginPage({ dictionary, lang }: { dictionary: any; lang:
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 relative overflow-hidden">
-      <div className="absolute top-6 right-6 z-50">
-        <LanguageSwitcher currentLang={lang} variant="dark" />
-      </div>
       {/* Animated background orbs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -left-40 w-96 h-96 bg-brand/20 rounded-full blur-3xl animate-float" />
@@ -49,8 +46,12 @@ export default function LoginPage({ dictionary, lang }: { dictionary: any; lang:
       <div className={`relative z-10 w-full max-w-md px-6 animate-login-appear ${isShaking ? "animate-shake" : ""}`}>
         {/* Logo & Title */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-brand to-brand-light shadow-2xl shadow-brand/40 mb-5 animate-float">
-            <span className="text-white font-bold text-3xl">A</span>
+          <div className="inline-flex items-center justify-center w-20 h-20 mb-5 animate-float">
+            <svg className="w-16 h-18" viewBox="0 0 40 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 2L38 12V26C38 35 30 42 20 44C10 42 2 35 2 26V12L20 2Z" stroke="white" strokeWidth="2" fill="none"/>
+              <path d="M20 8L32 15V25C32 31 27 37 20 39C13 37 8 31 8 25V15L20 8Z" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" fill="none"/>
+              <text x="20" y="27" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold" fontFamily="serif">A</text>
+            </svg>
           </div>
           <h1 className="text-3xl font-bold text-white mb-1">
             Aqbobek Lyceum
@@ -150,6 +151,11 @@ export default function LoginPage({ dictionary, lang }: { dictionary: any; lang:
               </div>
               <p className="text-center text-blue-300/30 mt-1">{dictionary.login.passwordHint}</p>
             </div>
+          </div>
+
+          {/* Language Switcher */}
+          <div className="mt-5 flex justify-center">
+            <LanguageSwitcher currentLang={lang} variant="dark" />
           </div>
         </div>
       </div>

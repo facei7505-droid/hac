@@ -84,10 +84,12 @@ export default function Dashboard({ dictionary, lang }: { dictionary: any; lang:
       {/* Sidebar */}
       <aside className="w-60 flex-shrink-0 bg-white border-r border-gray-200/80 flex flex-col">
         {/* Sidebar Logo */}
-        <div className="h-14 flex items-center gap-2.5 px-5 border-b border-gray-100">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand to-brand-light flex items-center justify-center shadow-sm shadow-brand/20">
-            <span className="text-white font-bold text-sm">A</span>
-          </div>
+        <div className="h-16 flex items-center gap-2.5 px-5 border-b border-gray-100">
+          <svg className="w-8 h-8 flex-shrink-0" viewBox="0 0 40 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 2L38 12V26C38 35 30 42 20 44C10 42 2 35 2 26V12L20 2Z" stroke="#3B82F6" strokeWidth="2.5" fill="none"/>
+            <path d="M20 8L32 15V25C32 31 27 37 20 39C13 37 8 31 8 25V15L20 8Z" stroke="#60A5FA" strokeWidth="1.5" fill="none"/>
+            <text x="20" y="27" textAnchor="middle" fill="#3B82F6" fontSize="14" fontWeight="bold" fontFamily="serif">A</text>
+          </svg>
           <div>
             <h1 className="text-sm font-bold text-gray-900 leading-tight">Aqbobek</h1>
             <p className="text-[10px] text-gray-400 leading-tight">Lyceum</p>
@@ -148,6 +150,15 @@ export default function Dashboard({ dictionary, lang }: { dictionary: any; lang:
               <MessageCircle size={18} className="text-gray-400" />
               <span>Мессенджер</span>
             </button>
+            {user?.role === "teacher" && (
+              <button
+                onClick={() => router.push(`/${lang}/teacher`)}
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-100/80 hover:text-gray-900 transition-all duration-200 cursor-pointer border border-gray-200/60"
+              >
+                <ClipboardList size={18} className="text-gray-400" />
+                <span>Дашборд учителя</span>
+              </button>
+            )}
           </div>
         )}
 

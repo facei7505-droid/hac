@@ -371,16 +371,42 @@ export default function StudentTab() {
                 }`}
               >
                 <p className="text-sm leading-relaxed">
-                  {aiAlertMode ? (
-                    <>
-                      <strong className="text-yellow-300">{t("student.aiDangerIcon")}</strong> {aiAdviceText}
-                    </>
-                  ) : (
-                    <>
-                      💡 <strong>{t("student.advice")}:</strong> {aiAdviceText}
-                    </>
-                  )}
+                  <strong className="text-yellow-300">⚠</strong> Внимание: С вероятностью 80% ты завалишь следующий СОЧ по химии из-за пробелов в теме Органическая химия.
                 </p>
+
+                <div className="mt-4">
+                  <h4 className="text-[11px] text-white/40 uppercase tracking-wider font-semibold mb-2">📚 Рекомендуемые материалы</h4>
+                  <div className="flex flex-col gap-2">
+                    <a
+                      href="https://www.youtube.com/watch?v=Fj7K5j5R9-0"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 transition-all cursor-pointer group"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-red-500/20 flex items-center justify-center flex-shrink-0 group-hover:bg-red-500/30 transition-colors">
+                        <svg className="w-4 h-4 text-red-400" fill="currentColor" viewBox="0 0 24 24"><path d="M10 15l5.19-3L10 9v6m11.56-7.83c.13.47.22 1.1.28 1.9.07.8.1 1.49.1 2.09L22 12c0 2.19-.16 3.8-.44 4.83-.25.9-.83 1.48-1.73 1.73-.47.13-1.33.22-2.65.28-1.3.07-2.49.1-3.59.1L12 19c-4.19 0-6.8-.16-7.83-.44-.9-.25-1.48-.83-1.73-1.73-.13-.47-.22-1.1-.28-1.9-.07-.8-.1-1.49-.1-2.09L2 12c0-2.19.16-3.8.44-4.83.25-.9.83-1.48 1.73-1.73.47-.13 1.33-.22 2.65-.28 1.3-.07 2.49-.1 3.59-.1L12 5c4.19 0 6.8.16 7.83.44.9.25 1.48.83 1.73 1.73z"/></svg>
+                      </div>
+                      <div>
+                        <div className="text-sm font-medium text-white">Видеоурок: Углеводороды</div>
+                        <div className="text-[11px] text-white/40">12 мин</div>
+                      </div>
+                    </a>
+                    <a
+                      href="https://www.youtube.com/watch?v=E_nK_zO-5P0"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 transition-all cursor-pointer group"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-red-500/20 flex items-center justify-center flex-shrink-0 group-hover:bg-red-500/30 transition-colors">
+                        <svg className="w-4 h-4 text-red-400" fill="currentColor" viewBox="0 0 24 24"><path d="M10 15l5.19-3L10 9v6m11.56-7.83c.13.47.22 1.1.28 1.9.07.8.1 1.49.1 2.09L22 12c0 2.19-.16 3.8-.44 4.83-.25.9-.83 1.48-1.73 1.73-.47.13-1.33.22-2.65.28-1.3.07-2.49.1-3.59.1L12 19c-4.19 0-6.8-.16-7.83-.44-.9-.25-1.48-.83-1.73-1.73-.13-.47-.22-1.1-.28-1.9-.07-.8-.1-1.49-.1-2.09L2 12c0-2.19.16-3.8.44-4.83.25-.9.83-1.48 1.73-1.73.47-.13 1.33-.22 2.65-.28 1.3-.07 2.49-.1 3.59-.1L12 5c4.19 0 6.8.16 7.83.44.9.25 1.48.83 1.73 1.73z"/></svg>
+                      </div>
+                      <div>
+                        <div className="text-sm font-medium text-white">Разбор задач на алканы</div>
+                        <div className="text-[11px] text-white/40">15 мин</div>
+                      </div>
+                    </a>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
