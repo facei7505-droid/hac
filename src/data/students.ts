@@ -23,11 +23,11 @@ export const subjects: Subject[] = [
 ];
 
 export const recentGrades: RecentGrade[] = [
-  { subject: "math", grade: 5, date: "28 мар", type: "test" },
-  { subject: "physics", grade: 5, date: "27 мар", type: "lab" },
-  { subject: "chemistry", grade: 4, date: "26 мар", type: "quiz" },
-  { subject: "literature", grade: 5, date: "25 мар", type: "essay" },
-  { subject: "english", grade: 4, date: "24 мар", type: "speaking" },
+  { subject: "math", grade: 5, date: new Date(Date.now() - 1000 * 60 * 5).toISOString(), type: "test" },
+  { subject: "physics", grade: 5, date: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString(), type: "lab" },
+  { subject: "chemistry", grade: 4, date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(), type: "quiz" },
+  { subject: "literature", grade: 5, date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 4).toISOString(), type: "essay" },
+  { subject: "english", grade: 4, date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 6).toISOString(), type: "speaking" },
 ];
 
 export const skillTree: Skill[] = [
@@ -42,6 +42,16 @@ export const skillTree: Skill[] = [
 ];
 
 export const weeklyData = [4.2, 4.5, 4.3, 4.7, 4.6, 4.8, 4.6];
+
+export const weeklyProgress = [
+  { day: "Пн", value: 70 },
+  { day: "Вт", value: 90 },
+  { day: "Ср", value: 40 },
+  { day: "Чт", value: 100 },
+  { day: "Пт", value: 85 },
+  { day: "Сб", value: 20 },
+  { day: "Вс", value: 0 },
+];
 
 export const teacherStudents: StudentRow[] = [
   { name: "Айдар Нурланов", grade: "10-A", avatar: "🧑‍🎓", mmr: 1842, mmrTier: "Legendary", gpa: 4.6, attendance: 97, streak: 12, trend: "up", risk: "low", subjects: [{ name: "math", grade: 5 }, { name: "physics", grade: 5 }] },

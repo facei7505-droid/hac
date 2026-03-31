@@ -594,6 +594,7 @@ function GradeHistoryProfileModal({
     const result: { subject: string; grade: number | "Н"; type: string; date: string; sortKey: number }[] = [];
 
     try {
+      if (typeof window === "undefined") return result;
       const overridesRaw = localStorage.getItem("aqbobek_student_overrides");
       const timestampsRaw = localStorage.getItem("aqbobek_grade_timestamps");
       const overrides = overridesRaw ? JSON.parse(overridesRaw) : {};

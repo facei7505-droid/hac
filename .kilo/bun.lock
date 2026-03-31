@@ -4,14 +4,14 @@
   "workspaces": {
     "": {
       "dependencies": {
-        "@kilocode/plugin": "7.1.10",
+        "@kilocode/plugin": "7.1.11",
       },
     },
   },
   "packages": {
-    "@kilocode/plugin": ["@kilocode/plugin@7.1.10", "", { "dependencies": { "@kilocode/sdk": "7.1.10", "zod": "4.1.8" } }, "sha512-vAhSR2IxcsJ8kDO1xbi7G29g/SIPrJ02/OG7TijanNZdmZcgAZkOidDiM9kd1DuauaRlP5bFsidSNcSNEFgXZw=="],
+    "@kilocode/plugin": ["@kilocode/plugin@7.1.11", "", { "dependencies": { "@kilocode/sdk": "7.1.11", "zod": "4.1.8" } }, "sha512-nAz7Vok7/GP+iuL/OxaUmeGTxJksxxRjdsmj26EdNOzwaG0x8N5LqZC19dfxSZUqK8KRixxByZpzyjtnNPWDrA=="],
 
-    "@kilocode/sdk": ["@kilocode/sdk@7.1.10", "", {}, "sha512-B3WDgI/BDedCuzNoXNTzEcNU3KugJwvKvxrCqsmH4I3t6x5DuHcsbjUXRi6aNRVkbh/Qut7kRkIsKHwjTbCD7w=="],
+    "@kilocode/sdk": ["@kilocode/sdk@7.1.11", "", {}, "sha512-ZebBy/M77eY3GI7/SmkNaDX9gjkCHG9w/lE0qH3wkmlEb6t2XuR2BBNvusLLmb876rPoNj6KZ6Gu4PLLMzNCKw=="],
 
     "zod": ["zod@4.1.8", "", {}, "sha512-5R1P+WwQqmmMIEACyzSvo4JXHY5WiAFHRMg+zBZKgKS+Q1viRa0C1hmUKtHltoIFKtIdki3pRxkmpP74jnNYHQ=="],
   }

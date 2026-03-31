@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { student, subjects, recentGrades, weeklyData } from "@/data/students";
-import { getMMRGradient, getGradeColor, formatRelativeDate } from "@/lib/utils";
+import confetti from "canvas-confetti";
+import { student, subjects, recentGrades, weeklyData, weeklyProgress } from "@/data/students";
+import { getMMRGradient, getGradeColor } from "@/lib/utils";
 import { useI18n } from "./I18nProvider";
 import { useStudentData } from "@/lib/student-data-context";
-import { useNotifications } from "@/lib/notifications-context";
 import {
   calculateStudentRisk,
   calculateGradeProbability,
@@ -15,10 +15,35 @@ import {
   type ProbabilityResult,
   type WeakSubjectResult,
 } from "@/lib/ai-tutor";
-import { X, Clock, Megaphone } from "lucide-react";
+import { X, Clock } from "lucide-react";
 
 const STUDENT_ID = "s1";
-const STUDENT_CLASS = "10-A";
+
+function timeAgo(dateString: string): string {
+  const now = Date.now();
+  const then = new Date(dateString).getTime();
+  const diffMs = now - then;
+  const diffMin = Math.floor(diffMs / 60000);
+  const diffHour = Math.floor(diffMs / 3600000);
+  const diffDay = Math.floor(diffMs / 86400000);
+
+  if (diffMin < 60) {
+    return `${diffMin} ${pluralizeRu(diffMin, "минуту", "минуты", "минут")} назад`;
+  }
+  if (diffHour < 24) {
+    return `${diffHour} ${pluralizeRu(diffHour, "час", "часа", "часов")} назад`;
+  }
+  return `${diffDay} ${pluralizeRu(diffDay, "день", "дня", "дней")} назад`;
+}
+
+function pluralizeRu(n: number, one: string, few: string, many: string): string {
+  const mod10 = n % 10;
+  const mod100 = n % 100;
+  if (mod100 >= 11 && mod100 <= 14) return many;
+  if (mod10 === 1) return one;
+  if (mod10 >= 2 && mod10 <= 4) return few;
+  return many;
+}
 
 interface GradebookData {
   students: { id: string; name: string; grade: string; avatar: string }[];
@@ -29,13 +54,7 @@ interface GradebookData {
 export default function StudentTab() {
   const { t, lang } = useI18n();
   const { overrides, timestamps, getStudentMetrics, version } = useStudentData();
-  const { messages, markAsRead, unreadCount, getAnnouncementsFor, announcements } = useNotifications();
-  const visibleAnnouncements = useMemo(
-    () => getAnnouncementsFor("student", STUDENT_CLASS),
-    [announcements, getAnnouncementsFor]
-  );
   const [gradebook, setGradebook] = useState<GradebookData | null>(null);
-  const [showAllNotifications, setShowAllNotifications] = useState(false);
   const [showGradeHistory, setShowGradeHistory] = useState(false);
 
   useEffect(() => {
@@ -61,7 +80,7 @@ export default function StudentTab() {
   const allRecentGrades = useMemo(() => {
     const studentOverrides = overrides[STUDENT_ID] || {};
     const studentTimestamps = timestamps[STUDENT_ID] || {};
-    const overrideGrades: { subject: string; grade: number; date: string; type: string; timestamp?: string }[] = [];
+    const overrideGrades: { subject: string; grade: number; date: string; type: string }[] = [];
     for (const [subject, grades] of Object.entries(studentOverrides)) {
       const subjectTimestamps = studentTimestamps[subject] || {};
       for (const [colId, val] of Object.entries(grades)) {
@@ -70,9 +89,8 @@ export default function StudentTab() {
           overrideGrades.push({
             subject,
             grade: val,
-            date: ts ? formatRelativeDate(ts) : "Только что",
+            date: ts ? ts : new Date().toISOString(),
             type: "override",
-            timestamp: ts,
           });
         }
       }
@@ -243,7 +261,7 @@ export default function StudentTab() {
                       </div>
                     </div>
                   </div>
-                  <span className="text-xs text-gray-400">{g.date}</span>
+                  <span className="text-xs text-gray-400">{timeAgo(g.date)}</span>
                 </div>
               ))}
             </div>
@@ -373,122 +391,31 @@ export default function StudentTab() {
               <span className="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center">📈</span>
               {t("student.weeklyProgress")}
             </h3>
-            <div className="flex items-end gap-1 h-16">
-              {weeklyData.map((v, i) => (
-                <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                  <div
-                    className="w-full rounded-t-md bg-gradient-to-t from-brand to-brand-light transition-all duration-300 hover:from-brand-light hover:to-blue-300"
-                    style={{ height: `${((v - 3) / 2) * 100}%` }}
-                  />
-                  <span className="text-[10px] text-gray-400">{weekDays[i]}</span>
+            <div className="h-40 flex items-end justify-between gap-2">
+              {weeklyProgress.map((item, i) => (
+                <div key={i} className="flex-1 flex flex-col items-center gap-1 group">
+                  <div className="relative w-full flex flex-col items-center">
+                    <div className="absolute -top-8 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none z-10">
+                      <div className="bg-gray-900 text-white text-xs font-bold px-2.5 py-1 rounded-lg shadow-lg whitespace-nowrap">
+                        {item.value}%
+                        <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900" />
+                      </div>
+                    </div>
+                    <div
+                      className="w-full bg-blue-500 rounded-t-md transition-all group-hover:bg-blue-400 group-hover:shadow-lg"
+                      style={{ height: `${item.value}%` }}
+                    />
+                  </div>
+                  <span className="text-[11px] text-gray-400 font-medium group-hover:text-gray-700 transition-colors">
+                    {weekDays[i]}
+                  </span>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Notifications from Parent */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-            <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <span className="w-8 h-8 rounded-lg bg-pink-50 flex items-center justify-center relative">
-                💌
-                {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center animate-pulse">
-                    {unreadCount}
-                  </span>
-                )}
-              </span>
-              {t("student.notifications")}
-            </h3>
-            {messages.length === 0 ? (
-              <p className="text-sm text-gray-400 text-center py-4">{t("student.noNotifications")}</p>
-            ) : (
-              <div className="space-y-2">
-                {(showAllNotifications ? messages : messages.slice(0, 3)).map((msg) => (
-                  <div
-                    key={msg.id}
-                    className={`p-3 rounded-xl border transition-all ${
-                      msg.read
-                        ? "bg-gray-50/50 border-gray-100"
-                        : "bg-pink-50/50 border-pink-100"
-                    }`}
-                  >
-                    <div className="flex items-start gap-2">
-                      <span className="text-lg mt-0.5">{msg.read ? "💬" : "❤️"}</span>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-xs font-medium text-gray-400">{t("student.fromParent")}</span>
-                          {!msg.read && (
-                            <span className="w-1.5 h-1.5 rounded-full bg-pink-400 animate-pulse" />
-                          )}
-                        </div>
-                        <p className={`text-sm leading-relaxed ${msg.read ? "text-gray-500" : "text-gray-800 font-medium"}`}>
-                          {msg.text}
-                        </p>
-                        {!msg.read && (
-                          <button
-                            onClick={() => markAsRead(msg.id)}
-                            className="mt-1.5 text-xs text-pink-500 hover:text-pink-600 font-medium cursor-pointer"
-                          >
-                            {t("student.markAsRead")}
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-                {messages.length > 3 && (
-                  <button
-                    onClick={() => setShowAllNotifications(!showAllNotifications)}
-                    className="w-full text-xs text-brand hover:text-brand-light font-medium py-2 cursor-pointer"
-                  >
-                    {showAllNotifications ? "↑" : `+${messages.length - 3}`}
-                  </button>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* School Announcements */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-            <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <span className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center">
-                <Megaphone size={16} className="text-indigo-600" />
-              </span>
-              Школьная лента
-            </h3>
-            {visibleAnnouncements.length === 0 ? (
-              <p className="text-sm text-gray-400 text-center py-4">Нет объявлений</p>
-            ) : (
-              <div className="space-y-3">
-                {visibleAnnouncements.map((ann) => (
-                  <div
-                    key={ann.id}
-                    className="p-4 rounded-xl bg-gradient-to-br from-indigo-50/50 to-white border border-indigo-100/80 hover:border-indigo-200 transition-all"
-                  >
-                    <div className="flex items-start gap-3">
-                      <span className="text-xl mt-0.5">📢</span>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <span className="text-sm font-semibold text-gray-900">{ann.title}</span>
-                          <span className={`shrink-0 px-2 py-0.5 rounded-full text-[10px] font-medium ${
-                            ann.target === "all" ? "bg-emerald-50 text-emerald-600" :
-                            ann.target === "teachers" ? "bg-purple-50 text-purple-600" :
-                            "bg-blue-50 text-blue-600"
-                          }`}>
-                            {ann.target === "all" ? "Для всех" :
-                             ann.target === "teachers" ? "Учителя" :
-                             ann.target === "class-10-A" ? "Для 10-А" : "Для 9-Б"}
-                          </span>
-                        </div>
-                        <p className="text-xs text-gray-500 leading-relaxed">{ann.body}</p>
-                        <span className="text-[10px] text-gray-400 mt-1.5 block">Только что</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          {/* Weekly Bonus */}
+          <WeeklyBonus />
         </div>
       </div>
 
@@ -502,6 +429,82 @@ export default function StudentTab() {
           timestamps={timestamps}
         />
       )}
+    </div>
+  );
+}
+
+const CLAIM_KEY = "weekly_mmr_claimed";
+
+function WeeklyBonus() {
+  const [claimed, setClaimed] = useState(false);
+  const [claiming, setClaiming] = useState(false);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(CLAIM_KEY);
+      if (raw) {
+        const claimedAt = new Date(raw).getTime();
+        if (Date.now() - claimedAt < 7 * 24 * 60 * 60 * 1000) {
+          setClaimed(true);
+        }
+      }
+    } catch {}
+  }, []);
+
+  const handleClaim = () => {
+    if (claimed || claiming) return;
+    setClaiming(true);
+
+    confetti({
+      particleCount: 120,
+      spread: 90,
+      origin: { y: 0.55 },
+      colors: ["#6366f1", "#8b5cf6", "#a78bfa", "#c084fc", "#e879f9"],
+    });
+
+    try {
+      localStorage.setItem(CLAIM_KEY, new Date().toISOString());
+    } catch {}
+
+    setTimeout(() => {
+      setClaimed(true);
+      setClaiming(false);
+    }, 800);
+  };
+
+  return (
+    <div className="rounded-2xl p-6 text-white shadow-xl relative overflow-hidden bg-gradient-to-br from-amber-500 via-orange-500 to-rose-500">
+      <div className="absolute top-0 right-0 w-28 h-28 bg-white/10 rounded-full -translate-y-6 translate-x-6" />
+      <div className="absolute bottom-0 left-0 w-20 h-20 bg-white/10 rounded-full translate-y-4 -translate-x-4" />
+
+      <div className="relative z-10">
+        <div className="text-3xl mb-3">🎉</div>
+        <h3 className="text-lg font-bold mb-1">Еженедельный бонус</h3>
+        <p className="text-white/80 text-sm mb-5">
+          {claimed
+            ? "Ты получил награду за эту неделю. Отличная работа!"
+            : "Забери свои +50 MMR за хорошую учебу на этой неделе!"}
+        </p>
+
+        {claimed ? (
+          <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-white/20 backdrop-blur-sm">
+            <span className="text-lg">✅</span>
+            <span className="text-sm font-semibold">Награда получена. Приходи на следующей неделе!</span>
+          </div>
+        ) : (
+          <button
+            onClick={handleClaim}
+            disabled={claiming}
+            className={`w-full py-3.5 rounded-xl text-sm font-bold transition-all duration-300 cursor-pointer active:scale-95 ${
+              claiming
+                ? "bg-white/30 text-white/70 cursor-wait"
+                : "bg-white text-amber-600 hover:bg-amber-50 shadow-lg hover:shadow-xl"
+            }`}
+          >
+            {claiming ? "Начисляем..." : "🎁 Получить награду"}
+          </button>
+        )}
+      </div>
     </div>
   );
 }
@@ -546,12 +549,13 @@ function GradeHistoryModal({
 
   // Add static grades from data
   for (const g of recentGrades) {
+    const gDate = new Date(g.date);
     allGrades.push({
       subject: g.subject,
       grade: g.grade,
-      date: g.date,
+      date: `${gDate.getDate()} ${MONTHS_RU[gDate.getMonth()]}, ${gDate.getHours().toString().padStart(2, "0")}:${gDate.getMinutes().toString().padStart(2, "0")}`,
       type: g.type,
-      sortDate: 0,
+      sortDate: gDate.getTime(),
     });
   }
 
@@ -623,7 +627,7 @@ function GradeHistoryModal({
                   <div key={i} className="relative flex items-start gap-3">
                     <div className="absolute left-[-16px] top-1 w-3 h-3 rounded-full bg-brand border-2 border-white shadow-sm" />
                     <div className="flex-1 bg-gray-50 rounded-xl p-3">
-                      <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <span
                             className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold border ${getGradeColor(typeof g.grade === "number" ? g.grade : 3)}`}

@@ -30,6 +30,7 @@ import {
   Heart,
   User,
   Headphones,
+  Bell,
 } from "lucide-react";
 
 type TabDef = {
@@ -124,13 +125,20 @@ export default function Dashboard({ dictionary, lang }: { dictionary: any; lang:
 
         {/* My Profile link */}
         {user?.profileId && (
-          <div className="px-3 pb-1">
+          <div className="px-3 pb-1 space-y-1">
             <button
               onClick={() => router.push(`/${lang}/profile/${user.profileId}`)}
               className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-100/80 hover:text-gray-900 transition-all duration-200 cursor-pointer border border-gray-200/60"
             >
               <User size={18} className="text-gray-400" />
               <span>Мой профиль</span>
+            </button>
+            <button
+              onClick={() => router.push(`/${lang}/notifications`)}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-100/80 hover:text-gray-900 transition-all duration-200 cursor-pointer border border-gray-200/60"
+            >
+              <Bell size={18} className="text-gray-400" />
+              <span>Лента</span>
             </button>
           </div>
         )}

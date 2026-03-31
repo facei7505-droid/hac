@@ -1,12 +1,11 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
-import { adminStats, quickActions, systemServices } from "@/data/admin";
+import { adminStats, systemServices } from "@/data/admin";
 import { users } from "@/data/users";
 import Spinner from "@/components/ui/Spinner";
 import { useI18n } from "./I18nProvider";
 import { useProfile } from "@/lib/profile-context";
-import { useNotifications, type AnnouncementTarget } from "@/lib/notifications-context";
 import { useRouter } from "next/navigation";
 import {
   generateSchedule,
@@ -27,7 +26,6 @@ import {
   UserCog,
   FileText,
   Megaphone,
-  Send,
   AlertTriangle,
   Clock,
   RefreshCw,
@@ -67,7 +65,6 @@ export default function AdminTab() {
   const { t, lang } = useI18n();
   const logRef = useRef<HTMLDivElement>(null);
   const { profiles, approveAchievement, rejectAchievement } = useProfile();
-  const { addAnnouncement, announcements } = useNotifications();
   const router = useRouter();
 
   const [activeTab, setActiveTab] = useState<AdminTabId>("dashboard");
@@ -81,13 +78,11 @@ export default function AdminTab() {
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState<"all" | "student" | "teacher">("all");
 
-  const [annTitle, setAnnTitle] = useState("");
-  const [annBody, setAnnBody] = useState("");
-  const [annTarget, setAnnTarget] = useState<AnnouncementTarget>("all");
-
   const [simPhase, setSimPhase] = useState<"idle" | "loading" | "done">("idle");
   const [simLogIdx, setSimLogIdx] = useState(0);
   const [pushToasts, setPushToasts] = useState<string[]>([]);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isBackingUp, setIsBackingUp] = useState(false);
 
   const pendingAchievements = useMemo(() => {
     const results: {
@@ -182,15 +177,6 @@ export default function AdminTab() {
     rejectAchievement(profileId, achId);
     showToast("Достижение отклонено", "info");
   }, [rejectAchievement, showToast]);
-
-  const handlePublishAnnouncement = useCallback(() => {
-    if (!annTitle.trim() || !annBody.trim()) return;
-    addAnnouncement(annTitle.trim(), annBody.trim(), annTarget);
-    setAnnTitle("");
-    setAnnBody("");
-    setAnnTarget("all");
-    showToast("Объявление опубликовано!", "success");
-  }, [annTitle, annBody, annTarget, addAnnouncement, showToast]);
 
   const simLogs = useMemo(() => [
     "Инициализация AI-солвера...",
@@ -605,12 +591,57 @@ export default function AdminTab() {
               <span>⚡</span> {t("admin.quickActions")}
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              {quickActions.map((action) => (
-                <button key={action.label} className={`p-5 rounded-2xl bg-gradient-to-br ${action.color} text-white shadow-lg hover:shadow-xl hover:scale-[1.03] transition-all duration-300 cursor-pointer`}>
-                  <span className="text-3xl block mb-2">{action.icon}</span>
-                  <span className="text-sm font-semibold">{t(action.label)}</span>
-                </button>
-              ))}
+              {/* Export Schedule */}
+              <button
+                onClick={() => showToast("✅ Расписание успешно экспортировано в формате PDF. Загрузка начнется через секунду.")}
+                className="p-5 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 text-white shadow-lg hover:shadow-xl hover:scale-[1.03] active:scale-95 transition-all duration-300 cursor-pointer text-left"
+              >
+                <span className="text-3xl block mb-2">📄</span>
+                <span className="text-sm font-semibold">{t("admin.exportSchedule")}</span>
+              </button>
+
+              {/* Send Notifications — links to announcements page */}
+              <button
+                onClick={() => router.push(`/${lang}/admin/announcements`)}
+                className="p-5 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 text-white shadow-lg hover:shadow-xl hover:scale-[1.03] active:scale-95 transition-all duration-300 cursor-pointer text-left"
+              >
+                <span className="text-3xl block mb-2">🔔</span>
+                <span className="text-sm font-semibold">{t("admin.sendNotifications")}</span>
+              </button>
+
+              {/* Generate Reports */}
+              <button
+                onClick={() => {
+                  if (isGenerating) return;
+                  setIsGenerating(true);
+                  setTimeout(() => {
+                    setIsGenerating(false);
+                    showToast("📊 Сводный отчет успеваемости за месяц успешно сформирован!");
+                  }, 2000);
+                }}
+                disabled={isGenerating}
+                className={`p-5 rounded-2xl bg-gradient-to-br from-emerald-500 to-green-500 text-white shadow-lg hover:shadow-xl hover:scale-[1.03] active:scale-95 transition-all duration-300 cursor-pointer text-left ${isGenerating ? "opacity-80 cursor-wait" : ""}`}
+              >
+                <span className="text-3xl block mb-2">{isGenerating ? "⏳" : "📊"}</span>
+                <span className="text-sm font-semibold">{isGenerating ? "Генерация..." : t("admin.generateReports")}</span>
+              </button>
+
+              {/* Backup */}
+              <button
+                onClick={() => {
+                  if (isBackingUp) return;
+                  setIsBackingUp(true);
+                  setTimeout(() => {
+                    setIsBackingUp(false);
+                    showToast("💾 Резервная копия базы данных успешно сохранена на сервере.");
+                  }, 1500);
+                }}
+                disabled={isBackingUp}
+                className={`p-5 rounded-2xl bg-gradient-to-br from-purple-500 to-violet-500 text-white shadow-lg hover:shadow-xl hover:scale-[1.03] active:scale-95 transition-all duration-300 cursor-pointer text-left ${isBackingUp ? "opacity-80 cursor-wait" : ""}`}
+              >
+                <span className="text-3xl block mb-2">{isBackingUp ? "⏳" : "💾"}</span>
+                <span className="text-sm font-semibold">{isBackingUp ? "Создание копии..." : t("admin.backup")}</span>
+              </button>
             </div>
           </div>
 
@@ -632,88 +663,26 @@ export default function AdminTab() {
             </div>
           </div>
 
-          {/* Create Notification */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-            <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <span className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center">
-                <Megaphone size={16} className="text-indigo-600" />
+          {/* Announcements Stub */}
+          <button
+            onClick={() => router.push(`/${lang}/admin/announcements`)}
+            className="w-full bg-white rounded-2xl border border-gray-100 shadow-sm p-6 text-left hover:border-indigo-300 hover:shadow-md transition-all group cursor-pointer"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center group-hover:bg-indigo-100 transition-colors">
+                <Megaphone size={20} className="text-indigo-600" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="font-semibold text-sm text-gray-900">Управление объявлениями</div>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  Создание и просмотр push-уведомлений для учеников и учителей
+                </p>
+              </div>
+              <span className="text-indigo-600 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                →
               </span>
-              Создать объявление
-            </h3>
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium text-gray-700 block mb-1.5">Заголовок</label>
-                <input
-                  type="text"
-                  value={annTitle}
-                  onChange={(e) => setAnnTitle(e.target.value)}
-                  placeholder="Например: Завтра сокращенный день!"
-                  className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:bg-white transition-all"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium text-gray-700 block mb-1.5">Текст сообщения</label>
-                <textarea
-                  value={annBody}
-                  onChange={(e) => setAnnBody(e.target.value)}
-                  placeholder="Подробности объявления..."
-                  rows={3}
-                  className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:bg-white transition-all resize-none"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium text-gray-700 block mb-1.5">Таргетинг</label>
-                <select
-                  value={annTarget}
-                  onChange={(e) => setAnnTarget(e.target.value as AnnouncementTarget)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:bg-white transition-all"
-                >
-                  <option value="all">Все</option>
-                  <option value="teachers">Только Учителя</option>
-                  <option value="class-10-A">Только 10-А</option>
-                  <option value="class-9-B">Только 9-Б</option>
-                </select>
-              </div>
-              <button
-                onClick={handlePublishAnnouncement}
-                disabled={!annTitle.trim() || !annBody.trim()}
-                className="w-full py-3 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 shadow-lg shadow-indigo-500/20 hover:shadow-xl hover:shadow-indigo-500/30 transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
-              >
-                <Send size={16} />
-                Опубликовать (Отправить Push)
-              </button>
             </div>
-
-            {announcements.length > 0 && (
-              <div className="mt-6 pt-4 border-t border-gray-100">
-                <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
-                  Последние объявления ({announcements.length})
-                </h4>
-                <div className="space-y-2 max-h-48 overflow-y-auto">
-                  {announcements.slice(0, 5).map((ann) => (
-                    <div key={ann.id} className="flex items-start gap-3 p-3 rounded-xl bg-gray-50/50 border border-gray-100">
-                      <span className="text-lg mt-0.5">📢</span>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium text-gray-900 truncate">{ann.title}</span>
-                          <span className={`shrink-0 px-2 py-0.5 rounded-full text-[10px] font-medium ${
-                            ann.target === "all" ? "bg-emerald-50 text-emerald-600" :
-                            ann.target === "teachers" ? "bg-purple-50 text-purple-600" :
-                            "bg-blue-50 text-blue-600"
-                          }`}>
-                            {ann.target === "all" ? "Все" :
-                             ann.target === "teachers" ? "Учителя" :
-                             ann.target === "class-10-A" ? "10-А" : "9-Б"}
-                          </span>
-                        </div>
-                        <p className="text-xs text-gray-400 mt-0.5 truncate">{ann.body}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
+          </button>
         </div>
       )}
 

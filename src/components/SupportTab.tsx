@@ -22,6 +22,12 @@ interface ChatMessage {
   read: boolean;
 }
 
+interface ChatData {
+  userName: string;
+  userRole: string;
+  messages: ChatMessage[];
+}
+
 interface Ticket {
   id: string;
   userName: string;
@@ -38,7 +44,7 @@ interface Ticket {
 const AI_STORAGE_KEY = "ai_chat_history";
 const SUPPORT_STORAGE_KEY = "global_support_chats";
 
-type SupportChats = Record<string, ChatMessage[]>;
+type SupportChats = Record<string, ChatData>;
 
 const AI_GREETING: ChatMessage = {
   id: "ai-1",
@@ -66,26 +72,42 @@ const ROLE_AVATAR: Record<string, string> = {
 /* ──────────────────────── Mock data for seeding ──────────────── */
 
 const MOCK_CONVERSATIONS: SupportChats = {
-  "aidar.nurlanov@student.aqbobek.kz": [
-    { id: "m1", text: "Здравствуйте! У меня не отображается оценка по физике за СОР 2", sender: "user", timestamp: Date.now() - 300000, read: true },
-    { id: "m2", text: "Проверьте, пожалуйста, в журнале — возможно, оценка ещё не выставлена", sender: "admin", timestamp: Date.now() - 240000, read: true },
-    { id: "m3", text: "Нет, учитель сказал что уже выставил. В Smart Gradebook тоже нет", sender: "user", timestamp: Date.now() - 180000, read: true },
-    { id: "m4", text: "Можете скинуть скриншот? Мы передадим техникам", sender: "admin", timestamp: Date.now() - 120000, read: false },
-    { id: "m5", text: "У меня не отображается оценка по физике за СОР 2", sender: "user", timestamp: Date.now() - 60000, read: false },
-  ],
-  "gulnar.amanova@aqbobek.kz": [
-    { id: "m1", text: "Добрый день! Не могу загрузить расписание на следующую неделю", sender: "user", timestamp: Date.now() - 600000, read: true },
-    { id: "m2", text: "Не могу загрузить расписание на следующую неделю", sender: "user", timestamp: Date.now() - 60000, read: false },
-  ],
-  "nurlan.parent@aqbobek.kz": [
-    { id: "m1", text: "Здравствуйте! Как узнать текущий баланс на обедах ребёнка?", sender: "user", timestamp: Date.now() - 3600000, read: true },
-    { id: "m2", text: "Баланс можно проверить в разделе Smart-обед на dashboard вашего ребёнка", sender: "admin", timestamp: Date.now() - 3500000, read: true },
-    { id: "m3", text: "Как узнать текущий баланс на обедах?", sender: "user", timestamp: Date.now() - 3400000, read: true },
-  ],
-  "amina.kasymova@student.aqbobek.kz": [
-    { id: "m1", text: "Пароль не подходит к порталу, пробовала несколько раз", sender: "user", timestamp: Date.now() - 7200000, read: true },
-    { id: "m2", text: "Проблема решена! Пароль сброшен. Проверьте почту.", sender: "admin", timestamp: Date.now() - 7100000, read: true },
-  ],
+  "aidar.nurlanov@student.aqbobek.kz": {
+    userName: "Айдар Нурланов",
+    userRole: "Студент",
+    messages: [
+      { id: "m1", text: "Здравствуйте! У меня не отображается оценка по физике за СОР 2", sender: "user", timestamp: Date.now() - 300000, read: true },
+      { id: "m2", text: "Проверьте, пожалуйста, в журнале — возможно, оценка ещё не выставлена", sender: "admin", timestamp: Date.now() - 240000, read: true },
+      { id: "m3", text: "Нет, учитель сказал что уже выставил. В Smart Gradebook тоже нет", sender: "user", timestamp: Date.now() - 180000, read: true },
+      { id: "m4", text: "Можете скинуть скриншот? Мы передадим техникам", sender: "admin", timestamp: Date.now() - 120000, read: false },
+      { id: "m5", text: "У меня не отображается оценка по физике за СОР 2", sender: "user", timestamp: Date.now() - 60000, read: false },
+    ],
+  },
+  "gulnar.amanova@aqbobek.kz": {
+    userName: "Гульнар Аманова",
+    userRole: "Учитель",
+    messages: [
+      { id: "m1", text: "Добрый день! Не могу загрузить расписание на следующую неделю", sender: "user", timestamp: Date.now() - 600000, read: true },
+      { id: "m2", text: "Не могу загрузить расписание на следующую неделю", sender: "user", timestamp: Date.now() - 60000, read: false },
+    ],
+  },
+  "nurlan.parent@aqbobek.kz": {
+    userName: "Нурлан Нурланов",
+    userRole: "Родитель",
+    messages: [
+      { id: "m1", text: "Здравствуйте! Как узнать текущий баланс на обедах ребёнка?", sender: "user", timestamp: Date.now() - 3600000, read: true },
+      { id: "m2", text: "Баланс можно проверить в разделе Smart-обед на dashboard вашего ребёнка", sender: "admin", timestamp: Date.now() - 3500000, read: true },
+      { id: "m3", text: "Как узнать текущий баланс на обедах?", sender: "user", timestamp: Date.now() - 3400000, read: true },
+    ],
+  },
+  "amina.kasymova@student.aqbobek.kz": {
+    userName: "Амина Касымова",
+    userRole: "Студент",
+    messages: [
+      { id: "m1", text: "Пароль не подходит к порталу, пробовала несколько раз", sender: "user", timestamp: Date.now() - 7200000, read: true },
+      { id: "m2", text: "Проблема решена! Пароль сброшен. Проверьте почту.", sender: "admin", timestamp: Date.now() - 7100000, read: true },
+    ],
+  },
 };
 
 const MOCK_USER_NAMES: Record<string, string> = {
@@ -159,7 +181,23 @@ function loadSupportChats(): SupportChats {
   if (typeof window === "undefined") return {};
   try {
     const raw = localStorage.getItem(SUPPORT_STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      // Migrate old format: Record<string, ChatMessage[]> → Record<string, ChatData>
+      const migrated: SupportChats = {};
+      for (const [key, value] of Object.entries(parsed)) {
+        if (Array.isArray(value)) {
+          migrated[key] = {
+            userName: MOCK_USER_NAMES[key] || "",
+            userRole: MOCK_USER_ROLES[key] || "",
+            messages: value as ChatMessage[],
+          };
+        } else {
+          migrated[key] = value as ChatData;
+        }
+      }
+      return migrated;
+    }
   } catch {}
   return {};
 }
@@ -172,10 +210,10 @@ function saveSupportChats(data: SupportChats) {
 
 function updateSupportChat(
   userId: string,
-  updater: (prev: ChatMessage[]) => ChatMessage[]
+  updater: (prev: ChatData) => ChatData
 ) {
   const all = loadSupportChats();
-  all[userId] = updater(all[userId] || []);
+  all[userId] = updater(all[userId] || { userName: "", userRole: "", messages: [] });
   saveSupportChats(all);
 }
 
@@ -199,16 +237,13 @@ function seedMockTicketsIfEmpty() {
 
 function chatsToTickets(chats: SupportChats): Ticket[] {
   return Object.entries(chats)
-    .filter(([, msgs]) => msgs.length > 0)
-    .map(([userId, messages]) => {
-      const firstUserMsg = messages.find((m) => m.sender === "user");
+    .filter(([, chatData]) => chatData.messages.length > 0)
+    .map(([userId, chatData]) => {
+      const { userName, userRole, messages } = chatData;
       return {
         id: userId,
-        userName: getUserDisplayName(
-          userId,
-          firstUserMsg?.text.slice(0, 30)
-        ),
-        userRole: getUserDisplayRole(userId),
+        userName: getUserDisplayName(userId, userName),
+        userRole: getUserDisplayRole(userId, userRole),
         userAvatar: getUserAvatar(userId),
         lastMessage: messages[messages.length - 1]?.text || "",
         unread: messages.filter((m) => m.sender !== "admin" && !m.read).length,
@@ -271,10 +306,12 @@ function UserSupportChat({
 
   /* Load from localStorage on mount */
   useEffect(() => {
+    const chats = loadSupportChats();
+    const chatData = chats[userChatId];
     setMessages({
       ai: loadAiChat(),
-      admin: loadSupportChats()[userChatId]?.length
-        ? loadSupportChats()[userChatId]
+      admin: chatData?.messages?.length
+        ? chatData.messages
         : [{ ...ADMIN_GREETING }],
     });
   }, [userChatId]);
@@ -283,11 +320,12 @@ function UserSupportChat({
   useEffect(() => {
     const interval = setInterval(() => {
       const chats = loadSupportChats();
-      const myChat = chats[userChatId];
-      if (myChat && myChat.length > 0) {
+      const chatData = chats[userChatId];
+      const myMessages = chatData?.messages;
+      if (myMessages && myMessages.length > 0) {
         setMessages((prev) => {
-          if (JSON.stringify(prev.admin) !== JSON.stringify(myChat)) {
-            return { ...prev, admin: myChat };
+          if (JSON.stringify(prev.admin) !== JSON.stringify(myMessages)) {
+            return { ...prev, admin: myMessages };
           }
           return prev;
         });
@@ -318,9 +356,13 @@ function UserSupportChat({
     if (activeChannel === "admin") {
       /* Student sending to admin channel → save to global_support_chats */
       setMessages((prev) => {
-        const updated = { ...prev, admin: [...prev.admin, userMsg] };
-        updateSupportChat(userChatId, () => updated.admin);
-        return updated;
+        const updatedAdmin = [...prev.admin, userMsg];
+        updateSupportChat(userChatId, (prev) => ({
+          userName: prev.userName || userName,
+          userRole: prev.userRole || userRole,
+          messages: updatedAdmin,
+        }));
+        return { ...prev, admin: updatedAdmin };
       });
       setInput("");
 
@@ -334,9 +376,13 @@ function UserSupportChat({
           read: true,
         };
         setMessages((prev) => {
-          const updated = { ...prev, admin: [...prev.admin, reply] };
-          updateSupportChat(userChatId, () => updated.admin);
-          return updated;
+          const updatedAdmin = [...prev.admin, reply];
+          updateSupportChat(userChatId, (prev) => ({
+            userName: prev.userName || userName,
+            userRole: prev.userRole || userRole,
+            messages: updatedAdmin,
+          }));
+          return { ...prev, admin: updatedAdmin };
         });
       }, 1200);
       return;
@@ -392,7 +438,7 @@ function UserSupportChat({
     } finally {
       setIsLoading(false);
     }
-  }, [input, activeChannel, isLoading, userChatId]);
+  }, [input, activeChannel, isLoading, userChatId, userName, userRole]);
 
   const channelMessages = messages[activeChannel];
 
@@ -569,7 +615,10 @@ function AdminSupportDashboard() {
       setInput("");
 
       /* Persist to localStorage */
-      updateSupportChat(userId, (prev) => [...prev, msg]);
+      updateSupportChat(userId, (prev) => ({
+        ...prev,
+        messages: [...prev.messages, msg],
+      }));
     },
     [selected]
   );
@@ -586,9 +635,10 @@ function AdminSupportDashboard() {
           : t
       )
     );
-    updateSupportChat(ticketId, (prev) =>
-      prev.map((m) => ({ ...m, read: true }))
-    );
+    updateSupportChat(ticketId, (prev) => ({
+      ...prev,
+      messages: prev.messages.map((m) => ({ ...m, read: true })),
+    }));
   }, []);
 
   return (
