@@ -80,3 +80,22 @@ export interface LogStep {
   text: string;
   status: "done" | "running" | "pending";
 }
+
+export interface GradebookStudent {
+  id: string;
+  name: string;
+  grade: string;
+  avatar: string;
+}
+
+export interface GradebookColumn {
+  id: string;
+  type: "lesson" | "sor" | "soch";
+  date?: string;
+  label: string;
+}
+
+export type GradeValue = number | "Н" | null;
+export type StudentGrades = Record<string, GradeValue>;
+export type SubjectGrades = Record<string, StudentGrades>;
+export type ClassGrades = Record<string, SubjectGrades>;

@@ -2,11 +2,13 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { users, UserRole } from "@/data/users";
+import { useProfile } from "@/lib/profile-context";
 
 interface AuthUser {
   email: string;
   name: string;
   role: UserRole;
+  profileId: string;
 }
 
 interface AuthContextType {
@@ -39,23 +41,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = (email: string, password: string): { success: boolean; error?: string } => {
     if (!email.endsWith("@aqbobek.kz")) {
-      return { success: false, error: "Доступ разрешен только для сотрудников и учеников Lyceum" };
+      return { success: false, error: "login.accessDenied" };
     }
 
     const found = users.find((u) => u.email === email && u.password === password);
     if (!found) {
-      return { success: false, error: "Неверный email или пароль" };
+      return { success: false, error: "login.wrongCredentials" };
     }
 
-    const authUser: AuthUser = { email: found.email, name: found.name, role: found.role };
+    const authUser: AuthUser = {
+      email: found.email,
+      name: found.name,
+      role: found.role,
+      profileId: found.profileId,
+    };
     setUser(authUser);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(authUser));
+    if (found.profileId) {
+      localStorage.setItem("aqbobek_current_profile_id", found.profileId);
+    } else {
+      localStorage.removeItem("aqbobek_current_profile_id");
+    }
     return { success: true };
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem("aqbobek_current_profile_id");
   };
 
   return (

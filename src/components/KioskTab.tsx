@@ -4,9 +4,11 @@ import { useEffect, useRef } from "react";
 import { topStudentsKiosk } from "@/data/students";
 import { substitutions, schedule } from "@/data/schedule";
 import { getMMRTextColorKiosk, getCup } from "@/lib/utils";
+import { useI18n } from "./I18nProvider";
 
 export default function KioskTab() {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const { t, lang } = useI18n();
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -40,12 +42,15 @@ export default function KioskTab() {
     };
   }, []);
 
+  const localeMap: Record<string, string> = { ru: "ru-RU", kk: "kk-KZ", en: "en-US" };
+  const locale = localeMap[lang] || "ru-RU";
+
   const now = new Date();
-  const timeStr = now.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
-  const dateStr = now.toLocaleDateString("ru-RU", { weekday: "long", day: "numeric", month: "long" });
+  const timeStr = now.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" });
+  const dateStr = now.toLocaleDateString(locale, { weekday: "long", day: "numeric", month: "long" });
 
   return (
-    <div className="min-h-screen -mx-[calc((100vw-100%)/2)] -mt-8 bg-gray-950 text-white px-8 py-6">
+    <div className="min-h-[calc(100vh-3.5rem)] bg-gray-950 text-white px-8 py-6">
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-brand to-brand-light flex items-center justify-center shadow-lg shadow-brand/30">
@@ -55,7 +60,7 @@ export default function KioskTab() {
             <h1 className="text-3xl font-black bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
               Aqbobek Lyceum
             </h1>
-            <p className="text-gray-500 text-lg">Информационный киоск</p>
+            <p className="text-gray-500 text-lg">{t("kiosk.subtitle")}</p>
           </div>
         </div>
         <div className="text-right">
@@ -69,7 +74,7 @@ export default function KioskTab() {
           <div className="p-6 pb-3 border-b border-gray-800/50">
             <h2 className="text-2xl font-bold flex items-center gap-3">
               <span className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-400 text-xl">📝</span>
-              Замены на сегодня
+              {t("kiosk.substitutions")}
             </h2>
           </div>
           <div ref={scrollRef} className="h-[480px] overflow-hidden relative">
@@ -78,7 +83,7 @@ export default function KioskTab() {
                 <div
                   key={i}
                   className={`flex items-center gap-4 p-4 rounded-2xl transition-all ${
-                    sub.change === "Отменён"
+                    sub.change === "kiosk.cancelled"
                       ? "bg-red-500/10 border border-red-500/20"
                       : "bg-gray-800/40 border border-gray-700/30 hover:bg-gray-800/60"
                   }`}
@@ -89,24 +94,24 @@ export default function KioskTab() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3 mb-1">
                       <span className="text-xl font-bold">{sub.class}</span>
-                      <span className={`text-xl font-bold ${sub.change === "Отменён" ? "text-red-400 line-through" : "text-white"}`}>
-                        {sub.subject}
+                      <span className={`text-xl font-bold ${sub.change === "kiosk.cancelled" ? "text-red-400 line-through" : "text-white"}`}>
+                        {t(`subject.${sub.subject}`)}
                       </span>
                     </div>
                     <div className="flex items-center gap-3 text-base">
                       <span className="text-gray-400">{sub.teacher}</span>
                       <span className="text-gray-600">·</span>
-                      <span className="text-gray-400">каб. {sub.room}</span>
+                      <span className="text-gray-400">{t("kiosk.room")} {sub.room}</span>
                     </div>
                   </div>
                   <div className={`px-4 py-2 rounded-xl text-sm font-semibold flex-shrink-0 ${
-                    sub.change === "Отменён"
+                    sub.change === "kiosk.cancelled"
                       ? "bg-red-500/20 text-red-400"
                       : sub.change.includes("Замена")
                         ? "bg-amber-500/10 text-amber-400"
                         : "bg-blue-500/10 text-blue-400"
                   }`}>
-                    {sub.change}
+                    {sub.change === "kiosk.cancelled" ? t("kiosk.cancelled") : sub.change}
                   </div>
                 </div>
               ))}
@@ -118,7 +123,7 @@ export default function KioskTab() {
           <div className="bg-gray-900/50 rounded-3xl border border-gray-800/50 p-6">
             <h2 className="text-2xl font-bold flex items-center gap-3 mb-6">
               <span className="text-amber-400">👑</span>
-              Топ учеников дня
+              {t("kiosk.topStudents")}
             </h2>
             <div className="space-y-4">
               {topStudentsKiosk.map((s, i) => (
@@ -138,7 +143,7 @@ export default function KioskTab() {
                       <span className="text-3xl">{s.avatar}</span>
                       <div>
                         <div className="text-lg font-bold truncate">{s.name}</div>
-                        <div className="text-sm text-gray-500">Класс {s.grade}</div>
+                        <div className="text-sm text-gray-500">{t("kiosk.class")} {s.grade}</div>
                       </div>
                     </div>
                   </div>
@@ -157,15 +162,15 @@ export default function KioskTab() {
           <div className="bg-gray-900/50 rounded-3xl border border-gray-800/50 p-6">
             <h2 className="text-2xl font-bold flex items-center gap-3 mb-4">
               <span className="text-brand-light">🕐</span>
-              Расписание на сегодня
+              {t("kiosk.schedule")}
             </h2>
             <div className="space-y-2">
               {schedule.map((s, i) => (
                 <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-gray-800/30 border border-gray-700/20">
                   <div className="text-base font-mono text-gray-400 w-28 flex-shrink-0">{s.time}</div>
                   <div className="flex-1">
-                    <div className="text-lg font-semibold">{s.subject}</div>
-                    <div className="text-sm text-gray-500">{s.teacher} · каб. {s.room}</div>
+                    <div className="text-lg font-semibold">{t(`subject.${s.subject}`)}</div>
+                    <div className="text-sm text-gray-500">{s.teacher} · {t("kiosk.room")} {s.room}</div>
                   </div>
                 </div>
               ))}

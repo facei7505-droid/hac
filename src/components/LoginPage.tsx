@@ -18,7 +18,11 @@ export default function LoginPage({ dictionary, lang }: { dictionary: any; lang:
 
     const result = login(email, password);
     if (!result.success) {
-      setError(result.error || "Ошибка входа");
+      const errorKey = result.error || "login.errorMsg";
+      const translated = errorKey.includes(".")
+        ? getNestedValue(dictionary, errorKey) || errorKey
+        : errorKey;
+      setError(translated);
       setIsShaking(true);
       setTimeout(() => setIsShaking(false), 500);
     }
@@ -27,7 +31,7 @@ export default function LoginPage({ dictionary, lang }: { dictionary: any; lang:
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 relative overflow-hidden">
       <div className="absolute top-6 right-6 z-50">
-        <LanguageSwitcher currentLang={lang} />
+        <LanguageSwitcher currentLang={lang} variant="dark" />
       </div>
       {/* Animated background orbs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -151,4 +155,14 @@ export default function LoginPage({ dictionary, lang }: { dictionary: any; lang:
       </div>
     </div>
   );
+}
+
+function getNestedValue(obj: any, path: string): string | undefined {
+  const keys = path.split(".");
+  let current = obj;
+  for (const key of keys) {
+    if (current == null) return undefined;
+    current = current[key];
+  }
+  return typeof current === "string" ? current : undefined;
 }

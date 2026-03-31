@@ -45,8 +45,28 @@ export function getCup(idx: number): string {
   return "";
 }
 
-export function getSkillLabel(level: number): string {
-  if (level >= 8) return "⭐ Мастер";
-  if (level >= 5) return "🔥 Продвинутый";
-  return "📖 Изучается";
+export function getSkillLabel(level: number, t?: (key: string) => string): string {
+  if (level >= 8) return t ? t("utils.master") : "⭐ Мастер";
+  if (level >= 5) return t ? t("utils.advanced") : "🔥 Продвинутый";
+  return t ? t("utils.learning") : "📖 Изучается";
+}
+
+export function formatRelativeDate(isoString: string): string {
+  const now = Date.now();
+  const then = new Date(isoString).getTime();
+  const diffMs = now - then;
+  const diffSec = Math.floor(diffMs / 1000);
+  const diffMin = Math.floor(diffSec / 60);
+  const diffHour = Math.floor(diffMin / 60);
+  const diffDay = Math.floor(diffHour / 24);
+
+  if (diffSec < 60) return "Только что";
+  if (diffMin < 60) return `${diffMin} ${diffMin === 1 ? "минуту" : diffMin < 5 ? "минуты" : "минут"} назад`;
+  if (diffHour < 24) return `${diffHour} ${diffHour === 1 ? "час" : diffHour < 5 ? "часа" : "часов"} назад`;
+  if (diffDay === 1) return "Вчера";
+  if (diffDay < 7) return `${diffDay} ${diffDay === 1 ? "день" : diffDay < 5 ? "дня" : "дней"} назад`;
+
+  const date = new Date(isoString);
+  const months = ["Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек"];
+  return `${date.getDate()} ${months[date.getMonth()]}`;
 }
